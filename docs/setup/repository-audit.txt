@@ -1,0 +1,28 @@
+=== ENVIRONMENT ===
+Mon Jul 27 23:17:04 +04 2026
+/home/davithline/projects/TelcoFlow.Automation
+davithline
+feature/qa-mvp-integration
+
+=== DIRECTORIES ===
+.
+./Projects
+./Projects/TelcoFlow.Automation
+./Projects/TelcoFlow.Automation/TelcoFlow.Tests
+./Projects/TelcoFlow.Automation/TelcoFlow.Tests/Pages
+./Projects/TelcoFlow.Automation/TelcoFlow.Tests/Services
+./Projects/TelcoFlow.Automation/TelcoFlow.Tests/TestData
+./Projects/TelcoFlow.Automation/TelcoFlow.Tests/Tests
+./docs
+./docs/setup
+
+=== FILES ===
+./Projects/TelcoFlow.Automation/.gitignore
+./Projects/TelcoFlow.Automation/README.md
+./Projects/TelcoFlow.Automation/TelcoFlow.Automation.sln
+./Projects/TelcoFlow.Automation/TelcoFlow.Tests/TelcoFlow.Tests.csproj
+./docs/setup/repository-audit.txt
+
+=== DOTNET PROJECTS ===
+./Projects/TelcoFlow.Automation/TelcoFlow.Automation.sln
+./Projects/TelcoFlow.Automation/TelcoFlow.Tests/TelcoFlow.Tests.csproj
