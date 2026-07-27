@@ -1,0 +1,11 @@
+{
+  "transaction_id": "TXN-2026-0001",
+  "correlation_id": "CORR-2026-0001",
+  "subscriber_id": "SUB-10001",
+  "amount": 25.0,
+  "currency": "GEL",
+  "bank_status": "SUCCESS",
+  "payment_service_status": "SUCCESS",
+  "billing_entry_exists": false,
+  "subscriber_balance_updated": false
+}
