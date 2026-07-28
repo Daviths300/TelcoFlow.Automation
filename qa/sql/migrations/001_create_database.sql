@@ -1,0 +1,5 @@
+IF DB_ID(N'TelcoFlowQA') IS NULL
+BEGIN
+    CREATE DATABASE TelcoFlowQA;
+END;
+GO
