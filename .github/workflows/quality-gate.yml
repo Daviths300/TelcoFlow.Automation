@@ -1,0 +1,118 @@
+name: TelcoFlow Quality Gate
+
+on:
+  push:
+    branches:
+      - master
+      - feature/qa-mvp-integration
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "20"
+
+      - name: Install Microsoft ODBC Driver 18
+        run: |
+          curl -sSL -O \
+            https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb
+
+          sudo dpkg -i packages-microsoft-prod.deb
+          rm packages-microsoft-prod.deb
+
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y \
+            msodbcsql18 \
+            unixodbc-dev
+
+      - name: Install Python dependencies
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Configure test environment
+        run: |
+          SA_PASSWORD="TfQa-${GITHUB_RUN_ID}-A9!x"
+
+          echo "::add-mask::$SA_PASSWORD"
+          echo "MSSQL_SA_PASSWORD=$SA_PASSWORD" >> "$GITHUB_ENV"
+          echo "MSSQL_PORT=14333" >> "$GITHUB_ENV"
+
+          printf \
+            'MSSQL_SA_PASSWORD=%s\nMSSQL_PORT=14333\n' \
+            "$SA_PASSWORD" > .env
+
+      - name: Start SQL Server
+        run: |
+          docker compose up -d
+
+          for attempt in {1..24}; do
+            STATUS="$(docker inspect \
+              --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}unknown{{end}}' \
+              telcoflow-sqlserver 2>/dev/null || true)"
+
+            echo "SQL Server health: $STATUS"
+
+            if [[ "$STATUS" == "healthy" ]]; then
+              exit 0
+            fi
+
+            sleep 5
+          done
+
+          docker compose logs sqlserver
+          exit 1
+
+      - name: Initialize test database
+        run: |
+          for file in \
+            qa/sql/migrations/001_create_database.sql \
+            qa/sql/migrations/002_create_schema.sql \
+            qa/sql/seed/001_payment_billing_mismatch.sql
+          do
+            echo "Applying: $file"
+
+            docker exec -i telcoflow-sqlserver \
+              /opt/mssql-tools18/bin/sqlcmd \
+              -S localhost \
+              -U sa \
+              -P "$MSSQL_SA_PASSWORD" \
+              -C \
+              -b < "$file"
+          done
+
+      - name: Run unified quality gate
+        run: |
+          chmod +x qa/bash/run_quality_gate.sh
+          ./qa/bash/run_quality_gate.sh
+
+      - name: Upload QA reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: telcoflow-qa-reports
+          path: qa/reports/
+          if-no-files-found: warn

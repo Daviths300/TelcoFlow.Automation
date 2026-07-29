@@ -75,6 +75,7 @@ curl -fsS \
   | python -m json.tool
 
 echo "== 6/6 Postman/Newman =="
+mkdir -p qa/reports/postman
 
 npx --yes newman run \
   "qa/postman/TelcoFlow Reconciliation API.postman_collection.json" \
