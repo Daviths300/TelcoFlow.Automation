@@ -1,0 +1,26 @@
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Robot Framework generated reports
+qa/reports/*
+!qa/reports/.gitkeep
+output.xml
+log.html
+report.html
+
+# Local databases and container data
+infrastructure/data/
+
+# IDE local state
+.vscode/settings.local.json

@@ -1,0 +1,539 @@
+{
+  "info": {
+    "_postman_id": "70343e2b-eceb-4080-9a25-765b640cb2f5",
+    "name": "TelcoFlow Reconciliation API",
+    "description": "Detects payment and billing inconsistencies from the TelcoFlowQA SQL Server database.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "48216367",
+    "_collection_link": "https://go.postman.co/collection/48216367-70343e2b-eceb-4080-9a25-765b640cb2f5?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "health",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Service is healthy\", function () {\r",
+                  "    const body = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(body.status).to.eql(\"ok\");\r",
+                  "    pm.expect(body.service).to.eql(\r",
+                  "        \"telcoflow-reconciliation-api\"\r",
+                  "    );\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time is below 1000 ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Successful Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/health",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "health"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"key_0\": \"string\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "api",
+      "item": [
+        {
+          "name": "payments",
+          "item": [
+            {
+              "name": "{transaction_id}",
+              "item": [
+                {
+                  "name": "Get Payment",
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test(\"Status code is 200\", function () {\r",
+                          "    pm.response.to.have.status(200);\r",
+                          "});\r",
+                          "\r",
+                          "pm.test(\"Correct payment is returned\", function () {\r",
+                          "    const body = pm.response.json();\r",
+                          "\r",
+                          "    pm.expect(body.transaction_id)\r",
+                          "        .to.eql(\"TXN-2026-DB-0001\");\r",
+                          "\r",
+                          "    pm.expect(body.correlation_id)\r",
+                          "        .to.eql(\"CORR-2026-DB-0001\");\r",
+                          "\r",
+                          "    pm.expect(body.bank_status)\r",
+                          "        .to.eql(\"SUCCESS\");\r",
+                          "\r",
+                          "    pm.expect(body.payment_service_status)\r",
+                          "        .to.eql(\"SUCCESS\");\r",
+                          "});\r",
+                          "\r",
+                          "pm.test(\"Billing inconsistency data is present\", function () {\r",
+                          "    const body = pm.response.json();\r",
+                          "\r",
+                          "    pm.expect(body.billing_entry_exists).to.eql(false);\r",
+                          "    pm.expect(body.subscriber_balance_updated).to.eql(false);\r",
+                          "});\r",
+                          "\r",
+                          "pm.test(\"Response data types are valid\", function () {\r",
+                          "    const body = pm.response.json();\r",
+                          "\r",
+                          "    pm.expect(body.amount).to.be.a(\"number\");\r",
+                          "    pm.expect(body.billing_entry_exists).to.be.a(\"boolean\");\r",
+                          "    pm.expect(body.subscriber_balance_updated).to.be.a(\"boolean\");\r",
+                          "});\r",
+                          "\r",
+                          "pm.test(\"Response time is below 1000 ms\", function () {\r",
+                          "    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+                          "});"
+                        ],
+                        "type": "text/javascript",
+                        "packages": {},
+                        "requests": {}
+                      }
+                    }
+                  ],
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/payments/TXN-2026-DB-0001",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "payments",
+                        "TXN-2026-DB-0001"
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Successful Response",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/payments/:transaction_id",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "payments",
+                            ":transaction_id"
+                          ],
+                          "variable": [
+                            {
+                              "key": "transaction_id",
+                              "value": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"key_0\": 6680\n}"
+                    },
+                    {
+                      "name": "Validation Error",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/payments/:transaction_id",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "payments",
+                            ":transaction_id"
+                          ],
+                          "variable": [
+                            {
+                              "key": "transaction_id",
+                              "value": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+                      "code": 422,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"detail\": [\n    {\n      \"loc\": [\n        \"string\",\n        \"string\"\n      ],\n      \"msg\": \"string\",\n      \"type\": \"string\",\n      \"input\": \"\",\n      \"ctx\": {}\n    },\n    {\n      \"loc\": [\n        2456,\n        217\n      ],\n      \"msg\": \"string\",\n      \"type\": \"string\",\n      \"input\": \"\",\n      \"ctx\": {}\n    }\n  ]\n}"
+                    }
+                  ]
+                },
+                {
+                  "name": "Get Unknown Payment — 404",
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test(\"Unknown transaction returns 404\", function () {\r",
+                          "    pm.response.to.have.status(404);\r",
+                          "});\r",
+                          "\r",
+                          "pm.test(\"Error response is valid JSON\", function () {\r",
+                          "    const contentType = pm.response.headers.get(\"Content-Type\");\r",
+                          "\r",
+                          "    pm.expect(contentType).to.include(\"application/json\");\r",
+                          "\r",
+                          "    pm.expect(function () {\r",
+                          "        pm.response.json();\r",
+                          "    }).not.to.throw();\r",
+                          "});\r",
+                          "\r",
+                          "pm.test(\"Error identifies the missing transaction\", function () {\r",
+                          "    const body = pm.response.json();\r",
+                          "\r",
+                          "    pm.expect(body.detail).to.be.a(\"string\");\r",
+                          "    pm.expect(body.detail)\r",
+                          "        .to.include(\"Transaction was not found\");\r",
+                          "\r",
+                          "    pm.expect(body.detail)\r",
+                          "        .to.include(\"TXN-DOES-NOT-EXIST\");\r",
+                          "});\r",
+                          "\r",
+                          "pm.test(\"Response time is below 2000 ms\", function () {\r",
+                          "    pm.expect(pm.response.responseTime)\r",
+                          "        .to.be.below(2000);\r",
+                          "});"
+                        ],
+                        "type": "text/javascript",
+                        "packages": {},
+                        "requests": {}
+                      }
+                    }
+                  ],
+                  "request": {
+                    "auth": {
+                      "type": "noauth"
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/payments/TXN-DOES-NOT-EXIST",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "payments",
+                        "TXN-DOES-NOT-EXIST"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "reconciliation",
+          "item": [
+            {
+              "name": "payments",
+              "item": [
+                {
+                  "name": "{transaction_id}",
+                  "item": [
+                    {
+                      "name": "Reconcile Payment",
+                      "event": [
+                        {
+                          "listen": "test",
+                          "script": {
+                            "exec": [
+                              "pm.test(\"Status code is 200\", function () {\r",
+                              "    pm.response.to.have.status(200);\r",
+                              "});\r",
+                              "\r",
+                              "pm.test(\"Response source is SQL Server\", function () {\r",
+                              "    const body = pm.response.json();\r",
+                              "\r",
+                              "    pm.expect(body.source).to.eql(\"sql-server\");\r",
+                              "});\r",
+                              "\r",
+                              "pm.test(\"Billing anomaly is detected\", function () {\r",
+                              "    const result = pm.response.json().reconciliation;\r",
+                              "\r",
+                              "    pm.expect(result.anomaly_detected).to.eql(true);\r",
+                              "    pm.expect(result.anomaly_code)\r",
+                              "        .to.eql(\"BILLING_ENTRY_MISSING\");\r",
+                              "});\r",
+                              "\r",
+                              "pm.test(\"Severity and priority are correct\", function () {\r",
+                              "    const result = pm.response.json().reconciliation;\r",
+                              "\r",
+                              "    pm.expect(result.severity).to.eql(\"HIGH\");\r",
+                              "    pm.expect(result.priority).to.eql(\"P0\");\r",
+                              "});\r",
+                              "\r",
+                              "pm.test(\"Correlation ID remains consistent\", function () {\r",
+                              "    const body = pm.response.json();\r",
+                              "\r",
+                              "    pm.expect(body.payment_state.correlation_id)\r",
+                              "        .to.eql(body.reconciliation.correlation_id);\r",
+                              "\r",
+                              "    pm.expect(body.payment_state.correlation_id)\r",
+                              "        .to.eql(\"CORR-2026-DB-0001\");\r",
+                              "});\r",
+                              "\r",
+                              "pm.test(\"Evidence confirms the inconsistency\", function () {\r",
+                              "    const evidence =\r",
+                              "        pm.response.json().reconciliation.evidence;\r",
+                              "\r",
+                              "    pm.expect(evidence.bank_status).to.eql(\"SUCCESS\");\r",
+                              "    pm.expect(evidence.payment_service_status)\r",
+                              "        .to.eql(\"SUCCESS\");\r",
+                              "\r",
+                              "    pm.expect(evidence.billing_entry_exists)\r",
+                              "        .to.eql(false);\r",
+                              "\r",
+                              "    pm.expect(evidence.subscriber_balance_updated)\r",
+                              "        .to.eql(false);\r",
+                              "});\r",
+                              "\r",
+                              "pm.test(\"Recommended action is provided\", function () {\r",
+                              "    const action =\r",
+                              "        pm.response.json()\r",
+                              "            .reconciliation\r",
+                              "            .recommended_action;\r",
+                              "\r",
+                              "    pm.expect(action)\r",
+                              "        .to.be.a(\"string\")\r",
+                              "        .and.not.empty;\r",
+                              "});\r",
+                              "\r",
+                              "pm.test(\"Response time is below 2000 ms\", function () {\r",
+                              "    pm.expect(pm.response.responseTime)\r",
+                              "        .to.be.below(2000);\r",
+                              "});"
+                            ],
+                            "type": "text/javascript",
+                            "packages": {},
+                            "requests": {}
+                          }
+                        }
+                      ],
+                      "request": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/reconciliation/payments/TXN-2026-DB-0001",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "reconciliation",
+                            "payments",
+                            "TXN-2026-DB-0001"
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "Successful Response",
+                          "originalRequest": {
+                            "method": "POST",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/reconciliation/payments/:transaction_id",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "reconciliation",
+                                "payments",
+                                ":transaction_id"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "transaction_id",
+                                  "value": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "json",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"key_0\": \"string\",\n  \"key_1\": 8179,\n  \"key_2\": \"string\",\n  \"key_3\": false\n}"
+                        },
+                        {
+                          "name": "Validation Error",
+                          "originalRequest": {
+                            "method": "POST",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/reconciliation/payments/:transaction_id",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "reconciliation",
+                                "payments",
+                                ":transaction_id"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "transaction_id",
+                                  "value": "string"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+                          "code": 422,
+                          "_postman_previewlanguage": "json",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"detail\": [\n    {\n      \"loc\": [\n        \"string\",\n        \"string\"\n      ],\n      \"msg\": \"string\",\n      \"type\": \"string\",\n      \"input\": \"\",\n      \"ctx\": {}\n    },\n    {\n      \"loc\": [\n        2456,\n        217\n      ],\n      \"msg\": \"string\",\n      \"type\": \"string\",\n      \"input\": \"\",\n      \"ctx\": {}\n    }\n  ]\n}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "/"
+    }
+  ]
+}
