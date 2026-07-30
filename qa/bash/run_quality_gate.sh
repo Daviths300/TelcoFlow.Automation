@@ -80,6 +80,7 @@ mkdir -p qa/reports/postman
 npx --yes newman run \
   "qa/postman/TelcoFlow Reconciliation API.postman_collection.json" \
   -e "qa/postman/TelcoFlow Local.postman_environment.json" \
+  --env-var "baseUrl=http://127.0.0.1:8000" \
   --reporters cli,junit \
   --reporter-junit-export qa/reports/postman/newman.xml
 
